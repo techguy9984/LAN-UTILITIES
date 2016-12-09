@@ -79,7 +79,7 @@ public class Main {
 								found = true;
 							}
 						}
-					}
+					} 
 					if(!found) {
 						save.addDatabaseEntry(input.split("\\s+")[2]+":"+input.split("\\s+")[3]);
 						System.out.println("Added entry: "+input.split("\\s+")[2]+":"+input.split("\\s+")[3]+" to the database.");
