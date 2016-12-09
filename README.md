@@ -16,17 +16,17 @@ player's computer. It will display text such as "Your team is: Counter terroist"
 questioning what the server IP is constantly. Whew.
 
 # Commands
-```add <name>``` Adds a player to the queue. The player must have a database profile.  
-```find``` Takes the current queue and finds a viable match.  
-```stop``` Closes the program.  
-```clear``` Clears the queue.  
-```push``` Pushs the current teams to all the clients.  
-```entry add <name> <skill>``` Adds a player to the database, if they are already specified in the database,   
+*```add <name>``` Adds a player to the queue. The player must have a database profile.  
+*```find``` Takes the current queue and finds a viable match.  
+*```stop``` Closes the program.  
+*```clear``` Clears the queue.  
+*```push``` Pushs the current teams to all the clients.  
+*```entry add <name> <skill>``` Adds a player to the database, if they are already specified in the database,   
 it will overwrite their profile. Skill must be between 0-1000.  
-```tol <#>``` Sets the tolerance level for total score differences.  
-```setip <>``` Sets the IP / message to push to all clients.  
-```reset``` removes all settings  
-```death to all``` Shuts down everybody's computer. Just kidding.  
+*```tol <#>``` Sets the tolerance level for total score differences.  
+*```setip <>``` Sets the IP / message to push to all clients.  
+*```reset``` removes all settings  
+*```death to all``` Shuts down everybody's computer. Just kidding.  
 
 # Updates
 The program will eventually take into account more detailed player profiles to more accuratly depict skill levels.
