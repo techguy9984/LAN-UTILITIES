@@ -16,7 +16,7 @@ player's computer. It will display text such as "Your team is: Counter terroist"
 questioning what the server IP is constantly. Whew.
 
 # Commands
-*```add <name>``` Adds a player to the queue. The player must have a database profile.  
+* ```add <name>``` Adds a player to the queue. The player must have a database profile.  
 *```find``` Takes the current queue and finds a viable match.  
 *```stop``` Closes the program.  
 *```clear``` Clears the queue.  
