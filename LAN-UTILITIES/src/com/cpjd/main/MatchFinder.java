@@ -7,7 +7,7 @@ public class MatchFinder {
 
 	/**
 	 * Chooses a match with a relatively even distribution of player skill.
-	 * 
+	 *  
 	 * First, it finds all possible team combinations. Second, it removes all
 	 * team combinations that don't meet the tolerance level. Third, it chooses
 	 * randomly from the remaining viable options.
