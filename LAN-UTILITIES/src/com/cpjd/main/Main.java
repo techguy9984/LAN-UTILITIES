@@ -26,14 +26,15 @@ public class Main {
 			try {
 				if (input.equals("help")) {
 					System.out.println("Command						Description");
-					System.out.println("add <name>.					Adds the player to the queue");
-					System.out.println("find 						Finds the teams");
+					System.out.println("add <name>					Adds the player to the queue.");
+					System.out.println("remove <name>             		 	Removes the player from the queue.");
+					System.out.println("find 						Finds the teams.");
 					System.out.println("stop 						Stops the program.");
 					System.out.println("clear 						Clears the queue.");
 					System.out.println("push 						Pushs the match to all the clients with the selected IP.");
 					System.out.println("tol <#> 					Sets the tolerance level for match skill differences.");
 					System.out.println("setip 						Sets the IP / message to push to clients.");
-					System.out.println("dat 						Outputs all information in the database");
+					System.out.println("dat 						Outputs all information in the database.");
 					System.out.println("display 					Sets the number of viable matches to display. -1 for default.");
 					System.out.println("entry add <name> <skill> 			Adds a player to the database (overwrites existing). Skill should be between 0-1000.");
 					System.out.println("reset 						Resets all settings to the default.");
@@ -60,6 +61,20 @@ public class Main {
 					for(int i = 0; i < save.getDatabase().size(); i++) {
 						System.out.println(save.getDatabase().get(i));
 					}
+				} else if(input.startsWith("remove")) {
+					boolean found = false;
+					for(int i = 0; i < queue.size(); i++) {
+						if(queue.get(i).contains(input.split("\\s+")[1])) {
+							queue.remove(i);
+							System.out.println("Player removed from queue.");
+							found = true;
+							break;
+						}
+					}
+					if(!found) {
+						System.out.println("Player is not in queue.");
+					}
+					
 				} else if(input.startsWith("queue")) {
 					System.out.println("CURRENT QUEUE: ");
 					for(int i = 0; i < queue.size(); i++) {
