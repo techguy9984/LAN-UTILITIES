@@ -1,9 +1,9 @@
-package com.cpjd.main;
+package com.cpjd.head;
 
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import com.cpjd.main.Prefs.Save;
+import com.cpjd.head.Prefs.Save;
 
 public class Main {
 	
