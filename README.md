@@ -33,6 +33,7 @@ it will overwrite their profile. Skill must be between 0-1000.
 * ```tol <#>``` Sets the tolerance level for total score differences.  
 * ```setip <>``` Sets the IP / message to push to all clients.  
 * ```reset``` removes all settings  
+* ```quit``` shuts down the server
 * ```death to all``` Shuts down everybody's computer. Just kidding.  
 
 # Server command-line commands
