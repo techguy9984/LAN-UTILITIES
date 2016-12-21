@@ -1,68 +1,111 @@
 package com.cpjd.client;
 
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.Color;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.net.Socket;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
 
-public class Client implements Runnable {
+public class Client implements ActionListener, Runnable {
 	
-	private Thread thread;
-	
-	private JFrame frame;
-	private JLabel label;
-	private String name;
-	private JTextField input;
-	
-	private final int UPDATE_INTERVAL = 3; // how often to check for an update
-	
-	private String TARGET_IP = "cpjd.zapto.org";
+	private JLabel team, ip;
+	JButton copy;
 	
 	public Client() {
-		frame = new JFrame("LAN Party Client");
-		frame.setSize(300, 200);
-		frame.setLocation(new Point(0,0));
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JFrame frame = new JFrame("Cats PJs LAN Client Version 1");
+		frame.setSize(400, 200);
+		frame.setResizable(false);
+		frame.setLocationRelativeTo(null);
 		frame.setLayout(null);
-		label = new JLabel("Server unavailable.");
-		label.setLocation(5, 15);
-		label.setSize(200, 25);
-		frame.add(label);
-		input = new JTextField();
-		input.setText("Enter your first name");
-		input.addMouseListener(new MouseAdapter() {
-			  @Override
-			  public void mouseClicked(MouseEvent e) {
-			    input.setText("");
-			  }
-			});
-		input.setLocation(5,50);
-		input.setSize(200, 25);
-		frame.add(input);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		copy = new JButton("COPY IP");
+		ip = new JLabel("Trying to connect to server... ");
+		team = new JLabel("Team: ");
+		JButton settings = new JButton("Settings");
+		
+		ip.setBounds(5,10,395,25);
+		copy.setBounds(5,35,100,25);
+		team.setBounds(5, 58, 395, 25);
+		settings.setBounds(5, 140, 100, 25);
+		
+		copy.setBorderPainted(false);
+		copy.setBackground(Color.MAGENTA);
+		copy.setForeground(Color.BLACK);
+		copy.setFocusable(false);
+		copy.addActionListener(this);
+		
+		settings.setBorderPainted(false);
+		settings.setBackground(Color.DARK_GRAY);
+		settings.setForeground(Color.WHITE);
+		settings.setFocusable(false);
+		settings.addActionListener(this);
+		
+		frame.add(copy);
+		frame.add(ip);
+		frame.add(team);
+		frame.add(settings);
 		frame.setVisible(true);
 		
-		thread = new Thread(this);
-		thread.setPriority(Thread.MIN_PRIORITY);
-		thread.start();
+		new Settings(true);
+		
+		new Thread(this).start();
 	}
 	
 	public void run() {
-		try {
-			Thread.sleep(UPDATE_INTERVAL * 1000);
-			label.setText(update(input.getText()));
-		} catch(Exception e) {}
+		while(true) {
+			try {
+				String response = update();
+				ip.setText("The gaming server's IP is: "+response.split(",")[0]);
+				if(response.split(",")[1].equals("t")) team.setText("Team: Terrorist");
+				else team.setText("Team: Counter-terrorist");
+				
+				Thread.sleep(5000);
+			} catch(Exception e) {
+				System.err.println("Failed to update. Trying again in 5 seconds.");
+			}
+		}
 	}
 	
-	public String update(String name) {
-		// gets IP:Team message
-		return "Connect to IP: ";
+	public String update() throws Exception {
+		Save slot = Settings.getSave();
+		Socket clientSocket = new Socket(slot.getServerIP(), Integer.parseInt(slot.getPort()));
+		DataOutputStream stream = new DataOutputStream(clientSocket.getOutputStream());
+		InputStream in = clientSocket.getInputStream();
+		stream.writeBytes("get,"+slot.getName()+"|");
+		String response = "";
+        while (true) {
+            int ch = in.read();
+            if ((ch < 0) || (ch == '|')) {
+                break;
+            }
+           response += (char)ch;
+        }
+		clientSocket.close();
+		return response;
 	}
 	
 	public static void main(String[] args) {
 		new Client();
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() == copy) {
+			StringSelection stringSelection = new StringSelection("connect "+ip.getText().split(":")[1].trim());
+			Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clpbrd.setContents(stringSelection, null);
+		} else {
+			new Settings(false);
+		}
 	}
 	
 }
