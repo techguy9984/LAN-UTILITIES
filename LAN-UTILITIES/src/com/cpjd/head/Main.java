@@ -1,5 +1,8 @@
 package com.cpjd.head;
 
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -42,6 +45,15 @@ public class Main {
 					if(!addPlayer(input.split("\\s+")[1])) {
 						System.out.println("Player was not added to queue. Not found in database.");
 					}
+				} else if(input.startsWith("push")) {
+					String push = "push,"+queue.size()+",";
+					for(int i = 0; i < queue.size(); i++) {
+						push+=queue.get(i)+",";
+					}
+					push += "|";
+					System.out.println("Server responded: "+push(push));
+				} else if(input.startsWith("quit")) {
+					System.out.println("Server responded: "+push("quit2609|"));
 				} else if(input.startsWith("stop")) {
 					System.out.println("Stopping app...");
 					running = false;
@@ -49,8 +61,6 @@ public class Main {
 				} else if(input.startsWith("find")) {
 					System.out.println("Finding teams...");
 					MatchFinder.find(queue, save.getTolerance(), save.getDisplay());
-				} else if(input.startsWith("push")) {
-					
 				} else if(input.startsWith("tol")) {
 					save.setTolerance(Integer.parseInt(input.split("\\s+")[1]));
 					System.out.println("Tolerance set to "+save.getTolerance()+".");
@@ -116,6 +126,34 @@ public class Main {
 		scanner.close();
 	}
 
+	/**
+	 * Pushes a command to the server
+	 * @param data The command to send
+	 * @return The server's response
+	 */
+	public String push(String data) {
+		try {
+			Socket headSocket = new Socket("192.168.0.2", 52000);
+			DataOutputStream stream = new DataOutputStream(headSocket.getOutputStream());
+			InputStream in = headSocket.getInputStream();
+			stream.writeBytes(data);
+			String response = "";
+			while (true) {
+				int ch = in.read();
+				if((ch < 0) || (ch == '|')) {
+					break;
+				}
+				response += (char) ch;
+			}
+			headSocket.close();
+			return response;
+		} catch (Exception e) {
+			System.err.println("Failed to push data to server");
+			e.printStackTrace();
+			return "Server did not respond";
+		}
+	}
+	
 	public static void main(String[] args) {
 		new Main();
 	}
