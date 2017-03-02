@@ -6,16 +6,26 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import com.cpjd.head.MatchFinder.Match;
 import com.cpjd.head.Prefs.Save;
 
-public class Main {
+public class MainV2 {
 	
 	private ArrayList<String> queue = new ArrayList<String>();
 	private ArrayList<String> database;
 	
 	private boolean running;
 	
-	public Main() {
+	private String serverIP = "192.168.0.2";
+	private int serverPort = 52000;
+	
+	private ArrayList<Match> matches;
+	private Match onDeck;
+	
+	private String team1 = "Counter-Terrorist";
+	private String team2 = "Terrorist";
+	
+	public MainV2() {
 		running = true;
 
 		Scanner scanner = new Scanner(System.in);
@@ -35,9 +45,13 @@ public class Main {
 					System.out.println("stop 						Stops the program.");
 					System.out.println("clear 						Clears the queue.");
 					System.out.println("push 						Pushs the match to all the clients with the selected IP.");
+					System.out.println("choose <match-id>          			Adds the selected match to the deck for pushing to the server.");
 					System.out.println("tol <#> 					Sets the tolerance level for match skill differences.");
 					System.out.println("setip 						Sets the IP / message to push to clients.");
 					System.out.println("dat 						Outputs all information in the database.");
+					System.out.println("team <#> <identifier        Sets the identifiers for team 1 and team 2.");
+					System.out.println("serverip <ip>              		 	Sets the local IP address of the server for pushing data to. Default 192.168.0.2.");
+					System.out.println("serverport <port>          			Sets the port on which the server is listening for data. Default: 52000.");
 					System.out.println("display 					Sets the number of viable matches to display. -1 for default.");
 					System.out.println("entry add <name> <skill> 			Adds a player to the database (overwrites existing). Skill should be between 0-1000.");
 					System.out.println("reset 						Resets all settings to the default.");
@@ -45,13 +59,42 @@ public class Main {
 					if(!addPlayer(input.split("\\s+")[1])) {
 						System.out.println("Player was not added to queue. Not found in database.");
 					}
-				} else if(input.startsWith("push")) {
-					String push = "push,"+queue.size()+",";
-					for(int i = 0; i < queue.size(); i++) {
-						push+=queue.get(i)+",";
+				} else if(input.startsWith("team")) {
+					if(Integer.parseInt(input.split("\\s+")[1]) == 1) team1 = input.split("\\s+")[2];
+					if(Integer.parseInt(input.split("\\s+")[1]) == 2) team2 = input.split("\\s+")[2];
+					System.out.println("Identifier set successfully.");
+				}
+				else if(input.startsWith("choose")) {
+					for(int i = 0; i < matches.size(); i++) {
+						if(matches.get(i).ID == Integer.parseInt(input.split("\\s+")[1])) {
+							onDeck = matches.get(i);
+							System.out.println("Match ID #"+onDeck.ID+" is now on deck to be pushed.");
+						}
 					}
-					push += "|";
-					System.out.println("Server responded: "+push(push));
+					if(onDeck == null) System.out.println("No match was found with ID: "+input.split("\\s+")[1]);
+				}
+				
+				else if(input.startsWith("serverport")) {
+					serverPort = Integer.parseInt(input.split("\\s+")[1]);
+					System.out.println("Server port set to: "+serverPort);
+				}
+				else if(input.startsWith("serverip")) { 
+					serverIP = input.split("\\s+")[1];
+					System.out.println("Server IP set to: "+serverIP);
+				} else if(input.startsWith("push")) {
+					// client knows that 1 is t, enything else is ct
+					if(onDeck == null) System.out.println("You haven't selected a match yet.");
+					else {
+						String push = "push,"+save.getMessage()+","+(onDeck.t1_players.size()+onDeck.t2_players.size())+",";
+						for(int i = 0; i < onDeck.t1_players.size(); i++) {
+							push+=onDeck.t1_players.get(i)+":1,";
+						}
+						for(int i = 0; i < onDeck.t2_players.size(); i++) {
+							push+=onDeck.t2_players.get(i)+":2,";
+						}
+						push += "|";
+						System.out.println("Server responded: "+push(push));
+					}
 				} else if(input.startsWith("quit")) {
 					System.out.println("Server responded: "+push("quit2609|"));
 				} else if(input.startsWith("stop")) {
@@ -60,7 +103,7 @@ public class Main {
 					System.exit(0);
 				} else if(input.startsWith("find")) {
 					System.out.println("Finding teams...");
-					MatchFinder.find(queue, save.getTolerance(), save.getDisplay());
+					matches = MatchFinder.find(queue, save.getTolerance(), save.getDisplay());
 				} else if(input.startsWith("tol")) {
 					save.setTolerance(Integer.parseInt(input.split("\\s+")[1]));
 					System.out.println("Tolerance set to "+save.getTolerance()+".");
@@ -133,7 +176,7 @@ public class Main {
 	 */
 	public String push(String data) {
 		try {
-			Socket headSocket = new Socket("192.168.0.2", 52000);
+			Socket headSocket = new Socket(serverIP, serverPort);
 			DataOutputStream stream = new DataOutputStream(headSocket.getOutputStream());
 			InputStream in = headSocket.getInputStream();
 			stream.writeBytes(data);
@@ -155,7 +198,7 @@ public class Main {
 	}
 	
 	public static void main(String[] args) {
-		new Main();
+		new MainV2();
 	}
 
 	/**

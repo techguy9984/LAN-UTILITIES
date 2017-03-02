@@ -37,7 +37,7 @@ public class Settings implements ActionListener {
 		Save saveSlot = getSave();
 		
 		if(saveSlot == null) { 
-			save(new Save("", "192.168.0.02", "52000"));
+			save(new Save("", "192.168.1.26", "52000"));
 			saveSlot = getSave();
 		}
 		

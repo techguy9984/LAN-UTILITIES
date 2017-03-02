@@ -17,10 +17,13 @@ public class MatchFinder {
 	 * @param display The amount of viable matches to display, -1 for default.
 	 * @return The Match that was selected
 	 */
-	public static void find(ArrayList<String> queue, int tolerance, int display) {
+	public static ArrayList<Match> find(ArrayList<String> queue, int tolerance, int display) {
+		ArrayList<Match> matchesFound = new ArrayList<Match>();
+		
+		
 		if(queue.size() <= 0) {
 			System.out.println("There are no players in the queue.");
-			return;
+			return matchesFound;
 		}
 		
 		ArrayList<String> chart = new ArrayList<String>();
@@ -36,8 +39,9 @@ public class MatchFinder {
 		ArrayList<Match> matches = new ArrayList<Match>();
 
 		// Process the possibilites
-		for (int row = 0; row < chart.size(); row++) {
+		for (int row = 0, id = 1; row < chart.size(); row++, id ++) {
 			Match match = new Match();
+			match.ID = id;
 			for (int col = 0; col < chart.get(row).length(); col++) {
 				if(chart.get(row).charAt(col) == '0') {
 					match.t1_players.add(queue.get(col).split(":")[0]);
@@ -65,15 +69,21 @@ public class MatchFinder {
 			selected = viable.get(r.nextInt(viable.size()));
 		} catch (Exception e) {
 			System.out.println("Match not found. Try increasing match tolerance.");
-			return;
+			return matchesFound;
 		}
 		// Output to the user
-		if(display == -1) printMatchInfo(selected);
+		if(display == -1) {
+			printMatchInfo(selected);
+			matchesFound.add(selected);
+		}
 		else {
 			for(int i = 0; i < viable.size() && i < display; i++) {
-				printMatchInfo(selected);
+				printMatchInfo(viable.get(i));
 			}
+			matchesFound.addAll(viable);
 		}
+		
+		return matchesFound;
 	}
 	
 	/**
@@ -81,6 +91,7 @@ public class MatchFinder {
 	 */
 	private static void printMatchInfo(Match match) {
 		System.out.println("FOUND A MATCH: ");
+		System.out.println("ID: "+match.ID);
 		System.out.println("Team 1 skill: " + match.t1_totalSkill);
 		String t1 = "";
 		for (int j = 0; j < match.t1_players.size(); j++) {
@@ -115,6 +126,8 @@ public class MatchFinder {
 	}*/
 	
 	public static class Match {
+		public int ID;
+		
 		public ArrayList<String> t1_players = new ArrayList<String>();
 		public int t1_totalSkill = 0;
 		

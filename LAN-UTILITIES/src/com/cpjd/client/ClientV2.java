@@ -14,12 +14,12 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-public class Client implements ActionListener, Runnable {
+public class ClientV2 implements ActionListener, Runnable {
 	
 	private JLabel team, ip;
 	JButton copy;
 	
-	public Client() {
+	public ClientV2() {
 		JFrame frame = new JFrame("Cats PJs LAN Client Version 1");
 		frame.setSize(400, 200);
 		frame.setResizable(false);
@@ -65,7 +65,7 @@ public class Client implements ActionListener, Runnable {
 			try {
 				String response = update();
 				ip.setText("The gaming server's IP is: "+response.split(",")[0]);
-				if(response.split(",")[1].equals("t")) team.setText("Team: Terrorist");
+				if(response.split(",")[1].equals("1")) team.setText("Team: Terrorist");
 				else team.setText("Team: Counter-terrorist");
 				
 				Thread.sleep(5000);
@@ -94,7 +94,7 @@ public class Client implements ActionListener, Runnable {
 	}
 	
 	public static void main(String[] args) {
-		new Client();
+		new ClientV2();
 	}
 
 	@Override

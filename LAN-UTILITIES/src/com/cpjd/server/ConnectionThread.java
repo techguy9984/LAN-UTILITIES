@@ -28,11 +28,8 @@ public class ConnectionThread implements Runnable {
 	public ConnectionThread(Socket socket) {
 		this.socket = socket;
 		
-		TEAMS = new ArrayList<String>();
-		TEAMS.add("jake-t");
-		TEAMS.add("will-ct");
-		IP = "cpjd.zapto.com";
-		
+		IP = "192.168.56.1";
+
 		thread = new Thread(this);
 		thread.start();
 	}
@@ -56,7 +53,7 @@ public class ConnectionThread implements Runnable {
 	        socket.close();
 	        thread.join();
 		} catch(Exception e) { 
-			System.err.print("Failed to update a client.");
+			System.err.println("Failed to update a client.");
 			e.printStackTrace();
 		}
 	}
@@ -64,7 +61,7 @@ public class ConnectionThread implements Runnable {
 	private String getResponse(String request) {
 		if(request.split(",")[0].contains("get")) return getTeam(request.split(",")[1]);
 		if(request.split(",")[0].contains("push")) return createDatabase(request);
-		if(request.contains("quit2609")) Server.running = false;
+		if(request.contains("quit2609")) ServerV2.running = false;
 		return "Server did not recognize your request.";
 	}
 	
@@ -76,8 +73,8 @@ public class ConnectionThread implements Runnable {
 	private String createDatabase(String line) {
 		TEAMS = new ArrayList<String>();
 		
-		for(int i = 2; i < Integer.parseInt(line.split(",")[1] + 1); i++) {
-			TEAMS.add(line.split(",")[i]);
+		for(int i = 0; i < Integer.parseInt(line.split(",")[2]); i++) {
+			TEAMS.add(line.split(",")[i + 3]);
 		}
 		
 		IP = line.split(",")[1];
@@ -94,8 +91,9 @@ public class ConnectionThread implements Runnable {
 		if(TEAMS == null) return "Teams info isn't available yet.";
 		
 		for(int i = 0; i < TEAMS.size(); i++) {
-			if(TEAMS.get(i).split("-")[0].equalsIgnoreCase(name.trim())) {
-				return IP + ","+TEAMS.get(i).split("-")[1];
+			System.out.println(TEAMS.get(i));
+			if(TEAMS.get(i).split(":")[0].equalsIgnoreCase(name.trim())) {
+				return IP + ","+TEAMS.get(i).split(":")[1];
 			}
 		}
 		return "Teams info isn't available yet.";

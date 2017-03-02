@@ -4,13 +4,13 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server implements Runnable {
+public class ServerV2 implements Runnable {
 
 	private Thread thread;
 	public static volatile boolean running;
 	private int port;
 	
-	public Server(int port) {
+	public ServerV2(int port) {
 		this.port = port;
 		System.out.println("Starting server on port "+port+".");
 		
@@ -27,7 +27,7 @@ public class Server implements Runnable {
 		try {
 			serverSocket = new ServerSocket(port, 0, InetAddress.getLocalHost());
 		} catch(Exception e) {
-			System.err.println("Couldn't start server");
+			System.err.println("Couldn't start server. Is an instance of the server already running?");
 		}
 		while(running) {
 			try {
@@ -50,7 +50,7 @@ public class Server implements Runnable {
 		int port = 52000;
 		
 		if(args != null && args.length > 0) port = Integer.parseInt(args[0]);
-		new Server(port);
+		new ServerV2(port);
 	}
 	
 }
